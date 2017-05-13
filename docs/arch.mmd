@@ -1,0 +1,40 @@
+graph TD
+    client[HTTP Client]
+
+    subgraph Command-Side
+        restapi[REST API]
+    end
+
+    subgraph Apache Flink
+        application[Application Job]
+        projection[Projection Job]
+        analytics[Analytics Job]
+    end
+
+    subgraph Apache Kafka
+        commands[Commands Topic]
+        events[Events Topic]
+    end
+
+    subgraph Read-Side
+        deepstream[DeepStream.io]
+        influxdb[InfluxDB]
+    end
+
+    dashboard[Internal Dashboard]
+
+    client--HTTP Request-->restapi
+       
+    restapi--Commands-->commands    
+
+    commands-->application
+    application--Events-->events
+    events-->projection
+    events-->analytics
+	
+    projection--Read Models-->deepstream	
+    client--WS Subscription-->deepstream
+	
+    analytics--Metrics-->influxdb
+    dashboard-->influxdb
+
