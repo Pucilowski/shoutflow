@@ -3,11 +3,13 @@ package com.pucilowski.shoutflow
 import java.util.Properties
 
 import com.pucilowski.shoutflow.commands.UserCommand
+import com.pucilowski.shoutflow.domain.{ConcreteUserRepository, UserBehavior, UserRepository}
 import com.pucilowski.shoutflow.events._
 import com.pucilowski.shoutflow.flink.processors.UserProcessor
 import com.pucilowski.shoutflow.flink.schema.{UserCommandDeserializer, UserEventSerializer}
 import com.pucilowski.shoutflow.flink.sinks.ErrorPublisher
 import org.apache.flink.api.scala._
+import org.apache.flink.runtime.state.memory.MemoryStateBackend
 import org.apache.flink.streaming.api.TimeCharacteristic
 import org.apache.flink.streaming.api.scala.{DataStream, StreamExecutionEnvironment}
 import org.apache.flink.streaming.connectors.kafka.{FlinkKafkaConsumer010, FlinkKafkaProducer010}
@@ -25,6 +27,8 @@ object Application {
     val env = StreamExecutionEnvironment.getExecutionEnvironment
     env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime)
 
+    env.setStateBackend(new MemoryStateBackend())
+
     env.registerTypeWithKryoSerializer(classOf[java.util.UUID], classOf[de.javakaffee.kryoserializers.UUIDSerializer])
 
     //env.getConfig.enableForceKryo()
@@ -37,11 +41,11 @@ object Application {
       .addSource(new FlinkKafkaConsumer010("shouterCommands", new UserCommandDeserializer, consumerProps))
       .name("UserCommand")
 
-/*    commands
-      .map(x => s"[Cmd] ${x.toString}")
-      .name("x => s\"[Cmd] ${x.toString}\"")
-      .print()
-      .name("ShouterCommands.print()")*/
+    /*    commands
+          .map(x => s"[Cmd] ${x.toString}")
+          .name("x => s\"[Cmd] ${x.toString}\"")
+          .print()
+          .name("ShouterCommands.print()")*/
 
     val events = commands
       .keyBy(_.userId)
@@ -52,11 +56,11 @@ object Application {
       .addSink(new ErrorPublisher)
       .name("ErrorPublisher")
 
-/*    events
-      .map(x => s"[Evt] ${x.toString}")
-      .name("x => s\"[Evt] ${x.toString}\"")
-      .print()
-      .name("ShouterEvents.print()")*/
+    /*    events
+          .map(x => s"[Evt] ${x.toString}")
+          .name("x => s\"[Evt] ${x.toString}\"")
+          .print()
+          .name("ShouterEvents.print()")*/
 
     events
       .addSink(new FlinkKafkaProducer010[UserEvent]("shouterEvents", new UserEventSerializer, producerProps))

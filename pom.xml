@@ -17,7 +17,8 @@
 
     <properties>
         <scala.major.version>2.11</scala.major.version>
-        <scala.version>2.11.8</scala.version>
+        <scala.version>2.11.12</scala.version>
+
         <junit.version>4.11</junit.version>
         <scalatest.version>2.2.2</scalatest.version>
         <cucumber.version>1.2.0</cucumber.version>
@@ -38,12 +39,12 @@
             <scope>test</scope>
         </dependency>
         <!-- ScalaTest -->
-        <dependency>
-            <groupId>org.scalatest</groupId>
-            <artifactId>scalatest_${scala.major.version}</artifactId>
-            <version>${scalatest.version}</version>
-            <scope>test</scope>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>org.scalatest</groupId>-->
+            <!--<artifactId>scalatest_${scala.major.version}</artifactId>-->
+            <!--<version>${scalatest.version}</version>-->
+            <!--<scope>test</scope>-->
+        <!--</dependency>-->
         <!-- Cucumber-JVM -->
         <dependency>
             <groupId>info.cukes</groupId>

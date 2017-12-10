@@ -10,6 +10,7 @@ import com.pucilowski.shoutflow.flink.schema.UserEventDeserializer
 import com.pucilowski.shoutflow.flink.sinks._
 import com.pucilowski.shoutflow.flink.sinks.indexers._
 import org.apache.flink.api.scala._
+import org.apache.flink.runtime.state.memory.MemoryStateBackend
 import org.apache.flink.streaming.api.TimeCharacteristic
 import org.apache.flink.streaming.api.scala.{DataStream, StreamExecutionEnvironment}
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer010
@@ -18,8 +19,11 @@ import org.apache.flink.util.Collector
 object Projections {
   def main(args: Array[String]): Unit = {
     val env: StreamExecutionEnvironment = StreamExecutionEnvironment.getExecutionEnvironment
-    env.registerTypeWithKryoSerializer(classOf[java.util.UUID], classOf[de.javakaffee.kryoserializers.UUIDSerializer])
     env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime)
+
+    env.registerTypeWithKryoSerializer(classOf[java.util.UUID], classOf[de.javakaffee.kryoserializers.UUIDSerializer])
+
+    env.setStateBackend(new MemoryStateBackend())
 
     val props = new Properties()
     props.put("bootstrap.servers", "localhost:9092")

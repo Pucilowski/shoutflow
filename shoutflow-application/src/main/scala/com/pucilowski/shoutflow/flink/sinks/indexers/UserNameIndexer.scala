@@ -19,21 +19,22 @@ class UserNameIndexer extends RichSinkFunction[UserNameUpdateEvent] {
   lazy val gson: Gson = new GsonBuilder().setPrettyPrinting().create()
 
   override def invoke(in: UserNameUpdateEvent): Unit = {
-    val userIdRecord = ds.record.getRecord(s"userName/${in.userName}")
     val lastUpdate = state.value()
 
+    if (lastUpdate != null && in.userName != lastUpdate.userName) {
+      val oldNormalizedUserName = lastUpdate.userName.toLowerCase
+      val oldUserIdRecord = ds.record.getRecord(s"userName/$oldNormalizedUserName")
+
+      oldUserIdRecord.delete()
+    }
+
     if (lastUpdate == null || in.userName != lastUpdate.userName) {
+      val normalizedUserName = in.userName.toLowerCase
+      val userIdRecord = ds.record.getRecord(s"userName/$normalizedUserName")
+
       val document = new JsonObject
       document.addProperty("userId", in.userId.toString)
       userIdRecord.set(gson.toJsonTree(document))
-    }
-
-    if (lastUpdate != null && in.userName != lastUpdate.userName) {
-      val oldUpdate = state.value()
-
-      val oldUserIdRecord = ds.record.getRecord(s"userName/${oldUpdate.userName}")
-
-      oldUserIdRecord.delete()
     }
 
     state.update(in)

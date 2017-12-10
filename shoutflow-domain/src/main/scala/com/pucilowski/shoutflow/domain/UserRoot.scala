@@ -5,7 +5,7 @@ import java.util.UUID
 import com.pucilowski.shoutflow.commands._
 import com.pucilowski.shoutflow.events._
 
-class UserRoot(userId: UUID) {
+class UserRoot(val userId: UUID) {
 
   var following: Set[UUID] = Set.empty
 
@@ -13,36 +13,6 @@ class UserRoot(userId: UUID) {
 
   var likes: Set[UUID] = Set.empty
 
-  def handle(command: UserCommand): Either[String, Seq[UserEvent]] = command match {
-    case cmd: ChangeUserName =>
-      Right(Seq(UserNameChanged(userId, cmd.userName)))
-    case cmd: UpdateUserProfile =>
-      Right(Seq(UserProfileUpdated(userId, cmd.avatarHash, cmd.fullName, cmd.location, cmd.bio)))
-    case FollowUser(_, followeeId, undo) =>
-      if (userId == followeeId)
-        Left(s"Cannot follow self! $userId")
-      else if (following.contains(followeeId) && !undo)
-        Left("Already following this user")
-      else if (!following.contains(followeeId) && undo)
-        Left("Not following this user")
-      else
-        Right(Seq(UserFollowedUser(userId, followeeId, undo)))
-    case SubmitPost(_, shoutId, shout) =>
-      Right(Seq(UserPosted(userId, shoutId, shout)))
-    case RemovePost(_, shoutId) =>
-      if (!posts.contains(shoutId))
-        Left("No such shout")
-      else
-        Right(Seq(UserRemovedPost(userId, shoutId)))
-    case LikePost(_, shoutId, undo) =>
-      if (likes.contains(shoutId) && !undo)
-        Left("Already liked")
-      else if (!likes.contains(shoutId) && undo)
-        Left("Shout isn't liked")
-      else
-        Right(Seq(UserLikedPost(userId, shoutId, undo)))
-    case cmd => Left(s"Unhandled command: $cmd")
-  }
 
   def apply(event: UserEvent) = event match {
     //case evt: UserNameChanged =>
