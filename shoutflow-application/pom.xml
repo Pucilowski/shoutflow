@@ -38,6 +38,15 @@ under the License.
                 <enabled>true</enabled>
             </snapshots>
         </repository>
+
+        <repository>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <id>bintray-deepstreamio-maven</id>
+            <name>bintray</name>
+            <url>http://dl.bintray.com/deepstreamio/maven</url>
+        </repository>
     </repositories>
 
     <properties>
@@ -112,14 +121,12 @@ under the License.
         </dependency>
 
 
-
         <!-- https://mvnrepository.com/artifact/org.json4s/json4s-native_2.10 -->
         <dependency>
             <groupId>org.json4s</groupId>
             <artifactId>json4s-native_${scala.binary.version}</artifactId>
             <version>3.5.1</version>
         </dependency>
-
 
 
         <!-- Apache Flink dependencies -->
@@ -268,7 +275,8 @@ under the License.
                                     <exclude>org.apache.flink:flink-python</exclude>
                                     <exclude>org.apache.flink:flink-metrics-core</exclude>
                                     <exclude>org.apache.flink:flink-metrics-jmx</exclude>
-                                    <exclude>org.apache.flink:flink-statebackend-rocksdb_${scala.binary.version}</exclude>
+                                    <exclude>org.apache.flink:flink-statebackend-rocksdb_${scala.binary.version}
+                                    </exclude>
                                     <exclude>org.apache.flink:flink-shaded-jackson</exclude>
 
                                     <!-- Also exclude very big transitive dependencies of Flink
